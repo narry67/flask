@@ -11,7 +11,6 @@ SWID = "{16238C1C-2AE5-48B5-97D3-D83DE6A81883}"
 ESPN_S2 = 'AEAYUFenNewPLUPryzYnqWva4yKbBYc6jaayOw0dZVK3%2B2XDeUPYZifj6lV%2FuieoH6u4sVyJOO%2F%2F30h4bEmtJU1ypE%2B3%2FvhO775jAIre5BOi6YTauugdCKil3cpbImsy3S8BBKAU5%2F595uTeDZuLOoLdrHNfEN5N6RFHqhZ1oOAfkSwygG3hGMogTOoYFiRdZVHC1PTexG63brkThblhOxTqlAGWxhZboHxhHfL2dxlccfe6EXafpDzSnJ5cGJr7DVxISFty5QMM8VBUuUsX%2FJKLSYAiDFl6HyPN6YqIn6rSTQ%3D%3D'
 LEAGUE_ID = 286725
 
-
 def get_league_data(year):
     return League(league_id=LEAGUE_ID, year=year, espn_s2=ESPN_S2, swid=SWID)
 
@@ -29,7 +28,7 @@ def get_all_years_data():
 
 
 def calculate_custom_power_rankings(league):
-    print('hi')
+
     """
     Calculate custom power rankings based on points scored, winning percentage,
     and performance vs median scores.
@@ -45,6 +44,7 @@ def calculate_custom_power_rankings(league):
     # Get the current week
     current_week = 1
     while True:
+        break
         try:
             box_scores = league.box_scores(current_week)
             if current_week != 1:
@@ -89,12 +89,11 @@ def calculate_custom_power_rankings(league):
                     teams_data[game.away_team.team_name]['wins'] += 1
 
             current_week += 1
-            print(current_week)
+            
         except Exception as e:
             break
 
     # Calculate power rankings
-    print('calculate power rankings')
     power_rankings = []
     for team_name, data in teams_data.items():
         if data['games'] == 0:  # Skip teams with no games
@@ -122,7 +121,9 @@ def calculate_custom_power_rankings(league):
 
 
 @app.route('/')
+
 def home():
+    
     leagues_data = get_all_years_data()
 
     # Compile data for all years
@@ -157,9 +158,12 @@ def home():
 
         # Calculate custom power rankings
         try:
-            power_rankings = calculate_custom_power_rankings(league)
-            year_data['power_rankings'] = power_rankings
-            print(year)
+            if year == datetime.now().year:
+                power_rankings = calculate_custom_power_rankings(league)
+                year_data['power_rankings'] = power_rankings
+                
+            else:
+                pass
         except:
             pass
         '''
@@ -224,16 +228,19 @@ def home():
 
         # Get recent activity
         try:
-            activities = league.recent_activity(size=10)
-            for activity in activities:
-                activity_data = []
-                for team, action, player in activity.actions:
-                    activity_data.append({
-                        'team': team.team_name,
-                        'action': action,
-                        'player': player
-                    })
-                year_data['recent_activity'].append(activity_data)
+            if year == datetime.now().year:
+                activitys = league.recent_activity(msg_type='TRADED')
+                for activity in activitys:
+                    activity_data = []
+                    for i, action in enumerate(activity.actions):
+                        
+                        activity_data.append({
+                            'action': i,
+                            'team': str(action[0]),
+                            'player': str(action[-2]),
+                        })
+                    year_data['recent_activity'].append(activity_data)
+                p
         except:
             pass
 
@@ -257,6 +264,7 @@ def home():
                     })
 
                 year_data['teams'].append(team_data)
+
         except:
             pass
 
@@ -370,7 +378,7 @@ HTML_TEMPLATE = '''
             <div class="tab-container">
                 <button class="tab-button active" onclick="showTab('standings-{{ year }}')">Standings</button>
                 <button class="tab-button" onclick="showTab('teams-{{ year }}')">Teams</button>
-                <button class="tab-button" onclick="showTab('activity-{{ year }}')">Recent Activity</button>
+                <button class="tab-button" onclick="showTab('activity-{{ year }}')">Trade History</button>
                 <button class="tab-button" onclick="showTab('stats-{{ year }}')">Statistics</button>
             </div>
 
@@ -425,11 +433,11 @@ HTML_TEMPLATE = '''
             </div>
 
             <div id="activity-{{ year }}" class="tab-content card">
-                <h3>Recent Activity</h3>
+                <h3>Trade History</h3>
                 {% for activity in year_data.recent_activity %}
                 <div class="card">
                     {% for action in activity %}
-                    <p>{{ action.team }} {{ action.action }} {{ action.player }}</p>
+                    <p> {{ action['team'] }} {{ action['player'] }}</p>
                     {% endfor %}
                 </div>
                 {% endfor %}
@@ -621,6 +629,10 @@ HTML_TEMPLATE = '''
 </body>
 </html>
 '''
+
+
+
+
 
 
 if __name__ == '__main__':

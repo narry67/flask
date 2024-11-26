@@ -19,7 +19,7 @@ def get_league_data(year):
 def get_all_years_data():
     data = {}
     current_year = datetime.now().year
-    for year in range(2020, current_year + 1):
+    for year in range(2014, current_year + 1):
         try:
             data[year] = get_league_data(year)
         except:

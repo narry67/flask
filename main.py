@@ -44,7 +44,7 @@ def calculate_custom_power_rankings(league):
     # Get the current week
     current_week = 1
     while True:
-        break
+
         try:
             box_scores = league.box_scores(current_week)
             if current_week != 1:

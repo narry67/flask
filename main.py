@@ -106,7 +106,7 @@ def calculate_custom_power_rankings(league):
 
         # Calculate power ranking score using the provided formula:
         # (points_scored ** 2) + (points_scored * winning_percentage) + (points_scored * median_percentage)
-        power_score = (points_scored ** 2) + (points_scored * winning_percentage) + (points_scored * median_percentage)
+        power_score = (points_scored * 2) + (points_scored * winning_percentage) + (points_scored * median_percentage)
 
         power_rankings.append({
             'team': team_name,
